@@ -1,0 +1,8 @@
+203.0.113.110 - - [10/Oct/2024:10:30:01 -0700] "GET /product.php?id=10%20AND%201=1%20--%20- HTTP/1.1" 200 734 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36"
+203.0.113.110 - - [10/Oct/2024:10:30:02 -0700] "GET /list.php?cat=5%27%20UNION%20SELECT%20NULL,version()--%20- HTTP/1.1" 500 210 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36"
+203.0.113.111 - - [10/Oct/2024:10:30:03 -0700] "GET /view?page=%3Cscript%3Edocument.location=%27x%27%3C/script%3E HTTP/1.1" 200 555 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0"
+203.0.113.111 - - [10/Oct/2024:10:30:04 -0700] "GET /profile?name=%3Csvg/onload=alert(1)%3E HTTP/1.1" 200 489 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0"
+198.51.100.210 - - [10/Oct/2024:10:30:05 -0700] "GET /phpmyadmin/ HTTP/1.1" 404 196 "-" "sqlmap/1.8#stable (https://sqlmap.org)"
+198.51.100.211 - - [10/Oct/2024:10:30:06 -0700] "HEAD /admin.php HTTP/1.1" 404 0 "-" "Nikto/2.5.0 (Evasions:None) (Test:map_codes)"
+198.51.100.212 - - [10/Oct/2024:10:30:07 -0700] "GET /cgi-bin/test.cgi HTTP/1.1" 404 196 "-" "Nmap Scripting Engine; https://nmap.org/book/nse.html"
+198.51.100.213 - - [10/Oct/2024:10:30:08 -0700] "GET /.env HTTP/1.1" 404 196 "-" "masscan/1.3"

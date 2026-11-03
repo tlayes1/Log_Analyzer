@@ -1,0 +1,10 @@
+Oct 10 11:20:05 host01 sshd[4120]: Failed password for invalid user admin from 203.0.113.120 port 55010 ssh2
+Oct 10 11:20:07 host01 sshd[4121]: Failed password for root from 203.0.113.120 port 55012 ssh2
+Oct 10 11:20:09 host01 sshd[4122]: Failed password for invalid user oracle from 203.0.113.121 port 40112 ssh2
+Oct 10 11:20:11 host01 sshd[4123]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.121 user=postgres
+Oct 10 11:25:30 host01 sudo:  carol : TTY=pts/0 ; PWD=/home/carol ; USER=root ; COMMAND=/bin/bash
+Oct 10 11:25:30 host01 sudo: pam_unix(sudo:session): session opened for user root by carol(uid=1001)
+Oct 10 11:40:12 host01 su[4890]: Successful su for root by dave
+Oct 10 11:40:12 host01 su[4890]: + /dev/pts/1 dave:root
+Oct 10 11:42:01 host01 su[4905]: FAILED su for root by eve
+Oct 10 11:42:01 host01 su[4905]: pam_unix(su:auth): authentication failure; logname=eve uid=1002 euid=0 tty=/dev/pts/1 ruser=eve rhost=  user=root

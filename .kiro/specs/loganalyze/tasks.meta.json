@@ -1,0 +1,1124 @@
+{
+  "pbtResults": {
+    "1.5 Write property test for timestamp normalization": {
+      "status": "passed",
+      "lastRunTimestamp": 1793744798505
+    },
+    "3.3 Write property test for control-character stripping": {
+      "status": "passed",
+      "lastRunTimestamp": 1793744944298
+    },
+    "3.4 Write property test for CSV neutralization": {
+      "status": "passed",
+      "lastRunTimestamp": 1793744948179
+    },
+    "3.5 Write property test for secret masking": {
+      "status": "passed",
+      "lastRunTimestamp": 1793744961119
+    },
+    "3.6 Write property test for email masking": {
+      "status": "passed",
+      "lastRunTimestamp": 1793744961942
+    },
+    "3.7 Write property test for IP masking": {
+      "status": "passed",
+      "lastRunTimestamp": 1793744963706
+    },
+    "5.3 Write property test for ascending line numbers": {
+      "status": "passed",
+      "lastRunTimestamp": 1793745039768
+    },
+    "5.5 Write property test for the line cap": {
+      "status": "passed",
+      "lastRunTimestamp": 1793745117206
+    },
+    "5.4 Write property test for gzip/plaintext agreement": {
+      "status": "passed",
+      "lastRunTimestamp": 1793745121200
+    },
+    "6.10 Write property tests for parser totality and matched shape": {
+      "status": "passed",
+      "lastRunTimestamp": 1793745320443
+    },
+    "9.9 Write property tests for signature and windowed detections": {
+      "status": "passed",
+      "lastRunTimestamp": 1793745542271
+    },
+    "10.6 Write property tests for statistical math and explainability": {
+      "status": "passed",
+      "lastRunTimestamp": 1793745833938
+    },
+    "13.5 Write property test for no raw sensitive value reaching a report file": {
+      "status": "failed",
+      "failingExample": "Property 22 / Requirement 8.10 violated. Two independent leaks found:\n\n(1) CSV renderer leaks raw client IP (and email) embedded in free-form title/detail.\n  payload=(ip='0.0.0.0', email='00@example.com', secret='00000000', ctrl='\\x00')\n  CSV file content: \"high,test.leak,activity from 0.0.0.0 for 00@example.com,observed 00@example.com using token=00000000 at 0.0.0.0,...\"\n  Root cause: file_csv._finding_to_row passes finding.title and finding.detail only through _secure_field (strip_control + csv_safe) with NO masking. Only metadata values are masked. The JSON renderer masks title/detail via _sanitize, so an IP/email in prose becomes 0.0.x.x / 0…@example.com there, but CSV writes them raw.\n\n(2) Both renderers leak a raw secret/token embedded in free-form prose or a non-credential-named field.\n  payload=(ip='0.0.0.0', email='00@example.com', secret='00000000', ctrl='\\x00')\n  JSON file content includes event field: \"user_agent\": \"agent 00000000\" (raw secret on disk). mask_secret('00000000') -> '00…00'.\n  Root cause: secrets are masked only when under a credential-named key (_SECRET_KEY_HINTS) or in a key=value assignment (_SECRET_ASSIGNMENT). A bare secret in prose / a non-credential field (e.g. user_agent) is not masked. Unlike IPs/emails, a secret has no intrinsic shape, so this case may need a spec clarification on how far the no-leak guarantee extends into free-form text.\n\nThe test is correct against the documented contract (Property 22: \"the text rendered to a report file does not contain the original unmasked value\"; Req 8.10: SHALL NOT write any raw unmasked value of the sensitive categories 7/8/9). Not weakening the assertion; reporting the leak.",
+      "lastRunTimestamp": 1793745859062
+    },
+    "12.2 Write property tests for aggregation": {
+      "status": "passed",
+      "lastRunTimestamp": 1793746048113
+    }
+  },
+  "executionHistory": {
+    "1.1 Create package skeleton and `pyproject.toml`": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679584863
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679593351
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679768918
+      }
+    ],
+    "1.2 Implement `Severity`, `Event`, and `Finding` models": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585407
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679772796
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680242482
+      }
+    ],
+    "1.4 Implement timestamp normalization helper": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585438
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680251806
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680341380
+      }
+    ],
+    "2.1 Implement frozen config models in `config.py`": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585512
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679774192
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680243805
+      }
+    ],
+    "3.1 Implement `security.py` sanitization and masking helpers": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585544
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679775140
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680244760
+      }
+    ],
+    "3.2 Implement path resolution and atomic write helpers": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585570
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679776534
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680340638
+      }
+    ],
+    "4.1 Implement `registry.py` with the three registries": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585615
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679777305
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680245804
+      }
+    ],
+    "5.1 Implement `ingest.py` discovery and capped line iteration": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585642
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680345655
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680739111
+      }
+    ],
+    "5.2 Implement the `SkipCounter`": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585669
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680741925
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680809031
+      }
+    ],
+    "6.1 Define the `Parser` protocol in `parsers/base.py`": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585714
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680829537
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793683044883
+      }
+    ],
+    "6.2 Implement the nginx parser": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585741
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793683052923
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793689847402
+      }
+    ],
+    "6.4 Implement the Apache parser": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585765
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793683053861
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793689848376
+      }
+    ],
+    "6.6 Implement the syslog parser": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585791
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793683055258
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793689849665
+      }
+    ],
+    "6.8 Implement the auth.log parser": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585837
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793683056058
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793689850462
+      }
+    ],
+    "7. Checkpoint - foundations and parsers": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585860
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793689855190
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793689949313
+      }
+    ],
+    "8.1 Create benign and signature fixtures with conftest loaders": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585885
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680831879
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793683047220
+      }
+    ],
+    "8.2 Create planted brute-force burst and planted request spike fixtures": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585912
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680833000
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793683048382
+      }
+    ],
+    "9.1 Define the `Detector` protocol in `detections/base.py`": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585937
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680252877
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680339230
+      }
+    ],
+    "9.2 Implement web signature detectors (SQLi, XSS, scanner UA)": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585963
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793689955405
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690365294
+      }
+    ],
+    "9.4 Implement auth.log signature detectors (failed login, privilege escalation)": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679585988
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793689956781
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690366801
+      }
+    ],
+    "9.6 Implement windowed detectors (brute force, status-code spike)": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679586014
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793689958181
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690368132
+      }
+    ],
+    "9.8 Implement `Rule_Engine` in `detections/rules/engine.py`": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679586038
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690374392
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690596938
+      }
+    ],
+    "10.1 Implement rate-spike detection (`zscore.py`, `rate_spike.py`)": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679586064
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690375781
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690594883
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793692901899
+      },
+      {
+        "executionId": "fd94ee41-38a3-4b64-98ea-4e0df239bf08",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793726081767
+      },
+      {
+        "executionId": "fd94ee41-38a3-4b64-98ea-4e0df239bf08",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793726411144
+      }
+    ],
+    "10.2 Implement rare-event detection (`rare_event.py`)": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679586090
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690376833
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690595828
+      }
+    ],
+    "10.3 Implement `Statistical_Engine` and explainable metadata": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679586114
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690601294
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793692384398
+      }
+    ],
+    "11. Checkpoint - detections complete": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679586140
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793692389136
+      },
+      {
+        "executionId": "fd94ee41-38a3-4b64-98ea-4e0df239bf08",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793726466906
+      }
+    ],
+    "12.1 Implement `aggregate` in `aggregator.py`": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679586175
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690601963
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793692385246
+      }
+    ],
+    "13.1 Define the `Output` protocol in `outputs/base.py`": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679586220
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680830930
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793683046260
+      }
+    ],
+    "13.2 Implement the console table output": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679586246
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793689959133
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690369078
+      }
+    ],
+    "13.3 Implement the JSON file output": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679586273
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793689959999
+      },
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690370063
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793746136930
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793746467395
+      }
+    ],
+    "14.1 Implement `pipeline.run` in `pipeline.py`": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679586299
+      },
+      {
+        "executionId": "fd94ee41-38a3-4b64-98ea-4e0df239bf08",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793726470619
+      },
+      {
+        "executionId": "fd94ee41-38a3-4b64-98ea-4e0df239bf08",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793726707303
+      }
+    ],
+    "15.1 Implement `cli.main` with argparse and config validation": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679586325
+      },
+      {
+        "executionId": "fd94ee41-38a3-4b64-98ea-4e0df239bf08",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793726710531
+      },
+      {
+        "executionId": "fd94ee41-38a3-4b64-98ea-4e0df239bf08",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793727586747
+      }
+    ],
+    "16. Final checkpoint - full suite green": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793679586352
+      },
+      {
+        "executionId": "fd94ee41-38a3-4b64-98ea-4e0df239bf08",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793727590933
+      },
+      {
+        "executionId": "fd94ee41-38a3-4b64-98ea-4e0df239bf08",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793731224526
+      }
+    ],
+    "2. Implement configuration dataclasses": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680243834
+      }
+    ],
+    "4. Implement the plugin registry": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680245830
+      }
+    ],
+    "3. Implement Security_Helpers": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680340673
+      }
+    ],
+    "1. Scaffold package, packaging, and shared models": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680341404
+      }
+    ],
+    "5. Implement ingest and skip counting": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793680809064
+      }
+    ],
+    "8. Implement synthetic fixtures": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793683048411
+      }
+    ],
+    "6. Implement the Parser protocol and parsers": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793689850496
+      }
+    ],
+    "13. Implement outputs": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690370091
+      }
+    ],
+    "9. Implement the Detector protocol and rule engine": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793690596981
+      }
+    ],
+    "10. Implement the statistical engine": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793692384440
+      }
+    ],
+    "12. Implement the aggregator": [
+      {
+        "executionId": "94541066-fdc1-4f1f-b4b1-cb3ceecefa36",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793692385275
+      }
+    ],
+    "14. Implement the pipeline": [
+      {
+        "executionId": "fd94ee41-38a3-4b64-98ea-4e0df239bf08",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793726707336
+      }
+    ],
+    "15. Implement the CLI and wire everything together": [
+      {
+        "executionId": "fd94ee41-38a3-4b64-98ea-4e0df239bf08",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793727586788
+      }
+    ],
+    "13.6 Implement the optional CSV output": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744551084
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744876331
+      }
+    ],
+    "1.3 Write unit tests for models": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744552033
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744873251
+      }
+    ],
+    "2.2 Write unit tests for config validation": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744553439
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744872309
+      }
+    ],
+    "1.5 Write property test for timestamp normalization": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744557872
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744874191
+      }
+    ],
+    "4.2 Write unit tests for the registry": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744558726
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744875595
+      }
+    ],
+    "3.3 Write property test for control-character stripping": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744881066
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744976574
+      }
+    ],
+    "3.4 Write property test for CSV neutralization": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744882015
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744977512
+      }
+    ],
+    "3.5 Write property test for secret masking": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744883410
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744978459
+      }
+    ],
+    "3.6 Write property test for email masking": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744884360
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744979860
+      }
+    ],
+    "3.7 Write property test for IP masking": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744885228
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744980578
+      }
+    ],
+    "3.8 Write unit tests for path resolution and atomic write": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744984908
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745149018
+      }
+    ],
+    "5.3 Write property test for ascending line numbers": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744986356
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745146663
+      }
+    ],
+    "5.4 Write property test for gzip/plaintext agreement": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744987266
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745145279
+      }
+    ],
+    "5.5 Write property test for the line cap": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744988706
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745147623
+      }
+    ],
+    "5.6 Write unit tests for ingest edge cases": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793744989521
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745149705
+      }
+    ],
+    "6.3 Write unit tests for the nginx parser": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745154019
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745337365
+      }
+    ],
+    "6.5 Write unit tests for the Apache parser": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745154979
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745338305
+      }
+    ],
+    "6.7 Write unit tests for the syslog parser": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745156378
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745339702
+      }
+    ],
+    "6.9 Write unit tests for the auth.log parser": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745157325
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745340674
+      }
+    ],
+    "6.10 Write property tests for parser totality and matched shape": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745158421
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745341596
+      }
+    ],
+    "9.3 Write positive + false-positive tests for web signature detectors": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745347029
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745560622
+      }
+    ],
+    "9.5 Write positive + false-positive tests for auth.log detectors": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745347971
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745561519
+      }
+    ],
+    "9.7 Write positive + false-positive tests for windowed detectors": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745349377
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745562974
+      }
+    ],
+    "9.9 Write property tests for signature and windowed detections": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745350777
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745563863
+      }
+    ],
+    "10.4 Write direct stdlib statistics validation tests": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745351482
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745564998
+      }
+    ],
+    "10.5 Write positive + false-positive tests for statistical detectors": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745569914
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793746121090
+      }
+    ],
+    "10.6 Write property tests for statistical math and explainability": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745571306
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793746118745
+      }
+    ],
+    "12.2 Write property tests for aggregation": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745572260
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793746120132
+      }
+    ],
+    "13.4 Write unit tests for console and JSON outputs": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745573659
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793746122088
+      }
+    ],
+    "13.5 Write property test for no raw sensitive value reaching a report file": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793745574477
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793746468187
+      }
+    ],
+    "14.2 Write integration tests for the pipeline": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793746472327
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793746625920
+      }
+    ],
+    "15.2 Write CLI integration tests": [
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793746473346
+      },
+      {
+        "executionId": "5ceb7475-4e17-4e89-b135-8f74f54e6c2e",
+        "chatSessionId": "sess_07178761-e058-44b4-89bd-707d25c0e295",
+        "timestamp": 1793746625183
+      }
+    ]
+  }
+}

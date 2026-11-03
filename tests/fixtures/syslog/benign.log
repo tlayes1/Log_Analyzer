@@ -1,0 +1,8 @@
+Oct 10 08:00:01 host01 CRON[2451]: (root) CMD (/usr/bin/php /var/www/cron/run.php)
+Oct 10 08:00:05 host01 systemd[1]: Started Session 142 of user alice.
+Oct 10 08:00:12 host01 kernel: [12345.678901] eth0: link up, 1000 Mbps, full duplex
+Oct 10 08:01:00 host02 dhclient[884]: DHCPACK of 192.0.2.50 from 192.0.2.1
+Oct 10 08:01:30 host02 systemd[1]: Reloading nginx configuration.
+Oct 10 08:02:05 host01 postfix/smtpd[3310]: connect from mail.example.com[198.51.100.60]
+Oct 10 08:02:45 host03 ntpd[712]: adjusting local clock by 0.004210s
+Oct 10 08:03:10 host01 systemd[1]: Finished daily apt download activities.
