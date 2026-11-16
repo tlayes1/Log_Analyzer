@@ -232,3 +232,62 @@ def test_json_report_is_written_and_masks_client_ip(tmp_path, capsys):
     # No raw client IP reaches disk; the masked prefix does.
     assert BRUTEFORCE_CLIENT_IP not in raw_text
     assert "198.51." in raw_text
+
+
+# --- HTML report (--html) + masking + self-containment ---------------------
+
+
+def test_html_report_is_written_and_masks_client_ip(tmp_path, capsys):
+    """--html writes a self-contained report, exits 1, and masks the client IP.
+
+    The brute-force fixture produces findings carrying the attacker's client IP.
+    The HTML renderer masks every log-derived value at the output boundary, so
+    the raw dotted-quad must not survive to disk while the masked prefix remains
+    for triage. The document must be self-contained (inline CSS + one inline
+    script, no external assets).
+    """
+    out_path = tmp_path / "report.html"
+
+    code = main([str(BRUTEFORCE_LOG), "--html", str(out_path)])
+
+    assert code == EXIT_FINDINGS
+    assert out_path.is_file()
+
+    text = out_path.read_text(encoding="utf-8")
+    assert text.startswith("<!DOCTYPE html>")
+    assert "What was found" in text
+    # Self-contained: no external asset references.
+    assert "http://" not in text and "https://" not in text
+    assert "src=" not in text
+    # Masking holds: no raw client IP, but the masked prefix is present.
+    assert BRUTEFORCE_CLIENT_IP not in text
+    assert "198.51." in text
+
+
+def test_html_report_header_names_source_and_skip_summary(tmp_path):
+    """The HTML header carries the input name and the skipped-line summary."""
+    out_path = tmp_path / "report.html"
+
+    code = main([str(BRUTEFORCE_LOG), "--html", str(out_path)])
+
+    assert code == EXIT_FINDINGS
+    text = out_path.read_text(encoding="utf-8")
+    assert BRUTEFORCE_LOG.name in text
+    assert "Skipped" in text and "unparseable=" in text
+
+
+def test_html_report_write_failure_returns_exit_error(tmp_path, capsys):
+    """An unwritable --html destination maps to the error exit (Requirement 8.13).
+
+    Pointing --html at a path whose parent is a regular file (not a directory)
+    makes the atomic write fail; the CLI surfaces it as a handled error and
+    returns the error exit code.
+    """
+    blocker = tmp_path / "not_a_dir"
+    blocker.write_text("x", encoding="utf-8")
+    bad_path = blocker / "report.html"  # parent is a file, so writing fails
+
+    code = main([str(BRUTEFORCE_LOG), "--html", str(bad_path)])
+
+    assert code == EXIT_ERROR
+    assert capsys.readouterr().err.strip() != ""

@@ -63,6 +63,7 @@ from loganalyze.config import (
 # renderers are resolvable by key. ``noqa: F401`` marks them intentionally
 # unused as names.
 from loganalyze.outputs import console as _console  # noqa: F401
+from loganalyze.outputs import file_html as _file_html  # noqa: F401
 from loganalyze.outputs import file_json as _file_json  # noqa: F401
 from loganalyze.outputs.base import OutputTarget
 from loganalyze.registry import get_parser
@@ -154,6 +155,14 @@ def _build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=None,
         help="write a CSV report to this path (optional)",
+    )
+    parser.add_argument(
+        "--html",
+        dest="report_html",
+        metavar="PATH",
+        type=Path,
+        default=None,
+        help="write a self-contained HTML report to this path",
     )
     parser.add_argument(
         "--max-line-bytes",
@@ -252,6 +261,7 @@ def _build_config(args: argparse.Namespace) -> RunConfig:
         format_override=args.format_override,
         report_json_path=args.report_json,
         report_csv_path=args.report_csv,
+        report_html_path=args.report_html,
         ingest=IngestConfig(max_line_bytes=max_line_bytes),
         detection=detection,
     )
@@ -300,6 +310,22 @@ def _render_outputs(result: pipeline.RunResult, config: RunConfig) -> None:
         except (OSError, ValueError) as exc:
             raise _CliError(
                 f"failed to write CSV report to {config.report_csv_path}: {exc}"
+            ) from exc
+
+    if config.report_html_path is not None:
+        html_output = _require_output("html")
+        try:
+            html_output.render(
+                result.findings,
+                OutputTarget(
+                    path=config.report_html_path,
+                    source=_describe_inputs(config.input_paths),
+                    skipped=_skip_summary(result),
+                ),
+            )
+        except (OSError, ValueError) as exc:
+            raise _CliError(
+                f"failed to write HTML report to {config.report_html_path}: {exc}"
             ) from exc
 
 
@@ -353,6 +379,44 @@ def _check_inputs(paths: list[Path]) -> None:
         raise _CliError(f"no readable input file found in: {joined}")
 
 
+def _skip_summary(result: pipeline.RunResult) -> str:
+    """Return the one-line skipped-line summary text (no trailing newline).
+
+    Names the total and the breakdown by reason (truncated at the byte cap vs.
+    unparseable), always including zero (Requirements 4.3, 4.4). Shared by the
+    standard-error report and the HTML report header so both read identically.
+
+    Args:
+        result: The completed run result carrying the skip counter.
+
+    Returns:
+        A summary such as ``"Skipped 12 lines (truncated=0, unparseable=12)."``.
+    """
+    skips = result.skips
+    return (
+        f"Skipped {skips.total} lines "
+        f"(truncated={skips.truncated}, unparseable={skips.unparseable})."
+    )
+
+
+def _describe_inputs(paths: list[Path]) -> str:
+    """Return a short, human description of the analyzed input set.
+
+    Names the single input when exactly one path was given, otherwise reports
+    the count. This is operator-supplied run metadata, never derived from log
+    content, so it is safe to show in a report header.
+
+    Args:
+        paths: The input files and/or directories supplied on the command line.
+
+    Returns:
+        A description such as ``"auth.log"`` or ``"3 inputs"``.
+    """
+    if len(paths) == 1:
+        return paths[0].name
+    return f"{len(paths)} inputs"
+
+
 def _report_skips(result: pipeline.RunResult, stream: TextIO) -> None:
     """Report the per-run skipped-line count to ``stream`` (Requirement 4.3).
 
@@ -365,11 +429,7 @@ def _report_skips(result: pipeline.RunResult, stream: TextIO) -> None:
         result: The completed run result carrying the skip counter.
         stream: The destination stream (standard error) for the summary.
     """
-    skips = result.skips
-    stream.write(
-        f"Skipped {skips.total} lines "
-        f"(truncated={skips.truncated}, unparseable={skips.unparseable}).\n"
-    )
+    stream.write(_skip_summary(result) + "\n")
 
 
 def main(argv: list[str] | None = None) -> int:

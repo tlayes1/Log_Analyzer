@@ -30,12 +30,24 @@ class OutputTarget:
     outputs carry the destination ``path``; console (stdout) outputs leave it
     as ``None``.
 
+    Optional, non-log-derived run context (``source`` and ``skipped``) lets a
+    richer renderer such as the HTML report label the report with what was
+    analyzed and how many lines were skipped. Both default to ``None`` so the
+    console, JSON, and CSV renderers are unaffected and ignore them. These values
+    are operator/run metadata, never derived from log content.
+
     Attributes:
         path: The destination file path for file outputs, or ``None`` to render
             to standard output.
+        source: Optional human description of the analyzed input set, for
+            renderers that show it in a header. Not log-derived.
+        skipped: Optional short skipped-line summary line, for renderers that
+            show it in a header. Not log-derived.
     """
 
     path: Path | None = None
+    source: str | None = None
+    skipped: str | None = None
 
 
 @runtime_checkable

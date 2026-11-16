@@ -110,6 +110,8 @@ class RunConfig:
             JSON report is requested.
         report_csv_path: Resolved path for the optional CSV report, or None when
             no CSV report is requested.
+        report_html_path: Resolved path for the self-contained HTML report, or
+            None when no HTML report is requested.
         ingest: Ingest-stage configuration.
         detection: Detection-stage configuration.
     """
@@ -118,6 +120,7 @@ class RunConfig:
     format_override: str | None
     report_json_path: Path | None
     report_csv_path: Path | None
+    report_html_path: Path | None = None
     ingest: IngestConfig = field(default_factory=IngestConfig)
     detection: DetectionConfig = field(default_factory=DetectionConfig)
 
